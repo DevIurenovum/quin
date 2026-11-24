@@ -67,15 +67,30 @@ mat3 headRot(vec3 p) {
 }
 `;
 
-function bendHead(material: THREE.Material): void {
+/**
+ * The Tripo texture is a washed-out grey. Push it to crisp black & white:
+ * greys below LOW go black, above HIGH go white, with a smooth ramp between.
+ */
+const CONTRAST = { low: 0.2, high: 0.75 };
+
+const contrastFragment = /* glsl */ `
+#include <map_fragment>
+float bwLum = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114));
+diffuseColor.rgb = vec3(smoothstep(${CONTRAST.low.toFixed(2)}, ${CONTRAST.high.toFixed(2)}, bwLum));
+`;
+
+/** Black & white on every part; the body also bends its head in the vertex shader. */
+function patchMaterial(material: THREE.Material, bendHead: boolean): void {
   material.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', contrastFragment);
+    if (!bendHead) return;
     Object.assign(shader.uniforms, headUniforms);
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>\n${bodyShaderHeader}`)
       .replace('#include <beginnormal_vertex>', 'vec3 objectNormal = headRot(position) * normal;')
       .replace('#include <begin_vertex>', 'vec3 transformed = uNeck + headRot(position) * (position - uNeck);');
   };
-  material.customProgramCacheKey = () => 'bird-head';
+  material.customProgramCacheKey = () => (bendHead ? 'bird-bw-head' : 'bird-bw');
   material.needsUpdate = true;
 }
 
@@ -105,9 +120,10 @@ export class BirdRig {
     pivot(this.wingRight, SHOULDER.clone().setZ(-SHOULDER.z), PARTS.wingRight, 'XYZ');
     pivot(this.tailPivot, TAIL_BASE, PARTS.tail, 'XYZ');
 
-    const body = find(PARTS.body) as THREE.Mesh;
-    bendHead(body.material as THREE.Material);
-    model.traverse((o) => (o.frustumCulled = false));
+    model.traverse((o) => {
+      o.frustumCulled = false;
+      if (o instanceof THREE.Mesh) patchMaterial(o.material as THREE.Material, o.name === PARTS.body);
+    });
   }
 
   apply(p: BirdPose): void {
