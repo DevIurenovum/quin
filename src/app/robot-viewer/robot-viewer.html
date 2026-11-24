@@ -1,0 +1,16 @@
+<div class="stage" #stage></div>
+
+@if (error(); as message) {
+  <p class="overlay">{{ message }}</p>
+} @else if (!loaded()) {
+  <div class="overlay">
+    <p>{{ progress() < 100 ? 'Cargando robot… ' + progress() + '%' : 'Preparando robot…' }}</p>
+    <div class="bar"><span [style.width.%]="progress()"></span></div>
+  </div>
+}
+
+<div class="actions" [class.hidden]="!loaded()">
+  <button type="button" (click)="wave()">👋 Saludar</button>
+  <button type="button" (click)="jump()">🦘 Saltar</button>
+</div>
+<p class="hint">Mueve el mouse: te sigue con la mirada · arrastra para girar · clic para saltar</p>

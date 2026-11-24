@@ -1,12 +1,13 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { BirdViewer } from './bird-viewer/bird-viewer';
+import { RobotViewer } from './robot-viewer/robot-viewer';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [BirdViewer, RobotViewer],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('quindel');
+  protected readonly model = signal<'bird' | 'robot'>('bird');
 }

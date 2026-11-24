@@ -1,0 +1,85 @@
+:host {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 40%, #fdf7ff 0%, #e6e9f7 60%, #cfd5ea 100%);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: #2a2740;
+  overflow: hidden;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  pointer-events: none;
+}
+
+.bar {
+  width: 220px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgb(42 39 64 / 15%);
+  overflow: hidden;
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  background: #6c5ce7;
+  transition: width 0.2s;
+}
+
+.actions {
+  position: absolute;
+  left: 50%;
+  bottom: 3.5rem;
+  translate: -50% 0;
+  display: flex;
+  gap: 0.75rem;
+  transition: opacity 0.3s;
+}
+
+.actions.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.65rem 1.3rem;
+  font: inherit;
+  font-weight: 600;
+  background: #fff;
+  color: inherit;
+  box-shadow: 0 4px 14px rgb(42 39 64 / 15%);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+.hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1rem;
+  margin: 0;
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  pointer-events: none;
+}
