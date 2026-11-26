@@ -9,7 +9,9 @@
   </div>
 }
 
-<div class="actions" [class.hidden]="!loaded()">
-  <button type="button" (click)="toggleFlight()">{{ flying() ? '🌿 Posarse' : '🐦 Volar' }}</button>
-</div>
-<p class="hint">Mueve el mouse: te sigue con la mirada · arrastra para girar · clic para volar o posarse</p>
+@if (!embedded()) {
+  <div class="actions" [class.hidden]="!loaded()">
+    <button type="button" (click)="toggleFlight()">{{ flying() ? '🌿 Posarse' : '🐦 Volar' }}</button>
+  </div>
+  <p class="hint">Mueve el mouse: te sigue con la mirada · arrastra para girar · clic para volar o posarse</p>
+}

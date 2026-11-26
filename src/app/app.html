@@ -1,10 +1,493 @@
-<nav class="switch">
-  <button type="button" [class.active]="model() === 'bird'" (click)="model.set('bird')">Colibrí</button>
-  <button type="button" [class.active]="model() === 'robot'" (click)="model.set('robot')">Robot</button>
-</nav>
+<!-- Chalk texture: roughens strokes and letter edges like chalk on a board. -->
+<svg class="defs" aria-hidden="true">
+  <filter id="chalk-rough" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" result="noise" />
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2" />
+  </filter>
+</svg>
 
-@if (model() === 'bird') {
-  <app-bird-viewer />
-} @else {
-  <app-robot-viewer />
-}
+<header class="nav">
+  <a class="logo" href="#top" aria-label="QUINDEL, inicio">
+    <app-chalk-bird class="logo-bird" />
+    <span>QUINDEL</span>
+  </a>
+  <nav>
+    <a href="#como-funciona">Cómo funciona</a>
+    <a href="#copiloto">El copiloto</a>
+    <a href="#planes">Planes</a>
+    <a href="#preguntas">Preguntas</a>
+  </nav>
+  <a class="btn btn-light btn-sm" href="#demo">Agendar demo</a>
+</header>
+
+<main id="top">
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <a class="pill" href="#como-funciona">
+      <span class="pill-dot"></span> Tu copiloto legal con IA, hecho en Ecuador <span aria-hidden="true">→</span>
+    </a>
+
+    <h1 class="board-title xl">
+      <span chalk>Tu próxima providencia</span><br />
+      <span chalk [chalkDelay]="650">
+        ya llegó.
+        <span class="mark">
+          QUINDEL ya lo sabe.
+          <svg class="scribble" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M3 14 C60 6 120 4 180 9 S270 15 297 6" pathLength="1" />
+          </svg>
+        </span>
+      </span>
+    </h1>
+
+    <p class="lede reveal">
+      QUINDEL vigila tus procesos en el SATJE y te avisa por WhatsApp apenas hay una providencia, una audiencia o un
+      plazo que corre. Te explica qué pasó y qué te toca hacer. <strong>Tú revisas. Tú decides.</strong>
+    </p>
+
+    <div class="cta-row reveal">
+      <a class="btn btn-light" href="#demo">Agendar una demo</a>
+      <a class="btn btn-ghost" href="#como-funciona">Ver cómo funciona <span aria-hidden="true">→</span></a>
+    </div>
+    <p class="fine reveal">Demo de 20 minutos · Registramos tus primeros procesos contigo · Sin tarjeta</p>
+
+    <div class="hero-stage">
+      <app-bird-viewer class="hero-bird" [embedded]="true" />
+
+      <div class="note note-l">
+        <span chalk [chalkDelay]="1600">revisa el SATJE cada hora</span>
+        <svg viewBox="0 0 120 70" aria-hidden="true"><path d="M6 8 C40 10 80 26 108 58 M92 54 L109 60 L106 42" pathLength="1" /></svg>
+      </div>
+      <div class="note note-r">
+        <span chalk [chalkDelay]="2300">te avisa por WhatsApp</span>
+        <svg viewBox="0 0 120 70" aria-hidden="true"><path d="M114 8 C80 10 40 26 12 58 M28 54 L11 60 L14 42" pathLength="1" /></svg>
+      </div>
+      <div class="note note-b">
+        <span chalk [chalkDelay]="3000">y cuida tus plazos</span>
+      </div>
+
+      <div class="horizon" aria-hidden="true">
+        <svg viewBox="0 0 1000 80" preserveAspectRatio="none">
+          <path d="M0 70 C250 10 750 10 1000 70" pathLength="1" />
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PERSONAS ============ -->
+  <section class="section light" id="como-funciona">
+    <h2 class="board-title">
+      <span chalk>Hecho para quienes</span><br />
+      <span chalk [chalkDelay]="500" class="mark-word">litigan en Ecuador.</span>
+    </h2>
+    <p class="lede reveal">Elige lo que mejor te describe. Te mostramos cómo QUINDEL encuentra lo que importa en tus procesos.</p>
+
+    <div class="tabs persona-tabs reveal" role="tablist">
+      <span class="tabs-label">Soy</span>
+      @for (p of personas; track p.id) {
+        <button type="button" role="tab" [class.on]="personaId() === p.id" [attr.aria-selected]="personaId() === p.id" (click)="personaId.set(p.id)">
+          {{ p.label }}
+        </button>
+      }
+    </div>
+    <p class="fine center">El mismo QUINDEL. Tu forma de trabajar.</p>
+
+    @for (per of [persona()]; track per.id) {
+    <div class="flow reveal">
+      <article class="card">
+        <small class="label">1 · Tú</small>
+        <p class="big">{{ per.you }}</p>
+      </article>
+      <span class="arrow" aria-hidden="true">→</span>
+      <article class="card">
+        <small class="label">2 · QUINDEL detecta</small>
+        <div class="case-chip">
+          <div><b>{{ per.caseId }}</b><small>{{ per.court }}</small></div>
+          <span class="badge">● Nuevo</span>
+        </div>
+        <p class="small">{{ per.event }}</p>
+      </article>
+      <span class="arrow" aria-hidden="true">→</span>
+      <article class="card">
+        <small class="label">3 · Tu alerta</small>
+        <div class="bubble">{{ per.alert }}</div>
+        <small class="fine">Por WhatsApp, en segundos.</small>
+      </article>
+    </div>
+    }
+  </section>
+
+  <!-- ============ WHY ============ -->
+  <section class="section letter" id="copiloto">
+    <app-chalk-bird class="letter-bird" />
+    <div class="letter-body">
+      <small class="label">Por qué existe QUINDEL</small>
+      <p class="reveal">Los mejores abogados que conocemos no pierden casos por falta de criterio. Los arriesgan por una providencia que nadie vio a tiempo.</p>
+      <p class="reveal">Revisar el SATJE proceso por proceso, cada mañana, anotar plazos en una libreta y buscar el expediente en tres carpetas distintas no es ejercer el derecho. Es trabajo de vigilancia.</p>
+      <p class="reveal">Por eso construimos QUINDEL: un copiloto que vuela delante de ti, revisa todo y vuelve con lo importante.</p>
+      <p class="reveal">No queremos reemplazar al abogado ni escribir por él. Queremos que nunca más se entere tarde.</p>
+      <p class="reveal"><strong>QUINDEL vigila. <span class="chalk-hl">Tú litigas.</span></strong></p>
+      <p class="reveal small muted">¿Quieres verlo con tus propios procesos? Escríbenos a <a href="mailto:hola@quindel.ec">hola&#64;quindel.ec</a>.</p>
+      <p class="sign">— El equipo de QUINDEL</p>
+    </div>
+  </section>
+
+  <!-- ============ WATCH ============ -->
+  <section class="section light">
+    <span class="kicker reveal"><app-chalk-bird class="kicker-bird" /> QUINDEL <em>revisa</em></span>
+    <h2 class="board-title">
+      <span chalk class="dim">37 procesos revisados esta mañana.</span><br />
+      <span chalk [chalkDelay]="900">Tres te necesitan.</span>
+    </h2>
+    <p class="lede reveal">
+      QUINDEL abre cada proceso como lo harías tú si tuvieras tiempo: lee la última actuación, la compara con la anterior y
+      te dice cuál requiere tu atención y por qué.
+    </p>
+
+    <div class="table-wrap reveal">
+      <span class="tag">Ejemplo · no son procesos reales</span>
+      <div class="table-box">
+      <app-peek-bird class="peek peek-table" side="left" />
+      <div class="table">
+        <div class="t-head">
+          <b>Mis procesos</b>
+          <span>Revisión de hoy · 06:00</span>
+        </div>
+        @for (r of watched; track r.id) {
+          <div class="t-row" [class.cold]="!r.hot">
+            <div>
+              <b>{{ r.id }}</b>
+              <small>{{ r.court }}</small>
+            </div>
+            <span class="t-last">{{ r.last }}</span>
+            <div class="t-score">
+              <b>{{ r.score }}</b>
+              <small>{{ r.note }}</small>
+            </div>
+          </div>
+        }
+        <div class="t-foot">Listo. 3 de 37 tienen movimiento, y cada uno ya tiene su resumen.</div>
+      </div>
+      </div>
+    </div>
+
+    <div class="stats reveal">
+      <div><b>37</b><small>procesos revisados</small></div>
+      <div><b>3</b><small>con movimiento</small></div>
+      <div><b>0</b><small>veces que abriste el SATJE</small></div>
+    </div>
+  </section>
+
+  <!-- ============ SUMMARISE ============ -->
+  <section class="section">
+    <span class="kicker reveal"><app-chalk-bird class="kicker-bird" /> QUINDEL <em>lo piensa</em></span>
+    <h2 class="board-title">
+      <span chalk>Un plazo.</span>{{ ' ' }}
+      <span chalk [chalkDelay]="350" class="dim">Y todo lo que hay detrás.</span>
+    </h2>
+    <p class="lede reveal">Qué pasó, qué te piden, cuándo vence y qué sabe ya de tu caso. QUINDEL te muestra de dónde sale cada dato para que lo verifiques.</p>
+
+    <div class="tabs reveal" role="tablist">
+      @for (s of summaries; track s.tab; let i = $index) {
+        <button type="button" role="tab" [class.on]="summaryIndex() === i" [attr.aria-selected]="summaryIndex() === i" (click)="summaryIndex.set(i)">{{ s.tab }}</button>
+      }
+    </div>
+
+    @for (sum of [summary()]; track sum.tab) {
+    <div class="panel summary reveal">
+      <app-peek-bird class="peek peek-summary" side="right" />
+      <div class="ring-wrap">
+        <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r="50" class="ring-bg" />
+          <circle cx="60" cy="60" r="50" class="ring-fg" pathLength="1" [style.--fill]="1 - sum.days / 20" />
+        </svg>
+        <div class="ring-num"><b>{{ sum.days }}</b><small>{{ sum.unit }}</small></div>
+      </div>
+      <ul class="reasons">
+        @for (r of sum.rows; track r.title) {
+          <li>
+            <span class="plus">+</span>
+            <div><b>{{ r.title }}</b><p>{{ r.quote }}</p></div>
+            <small>{{ r.source }}</small>
+          </li>
+        }
+      </ul>
+      <p class="verdict"><strong>{{ sum.verdict }}</strong></p>
+    </div>
+    }
+  </section>
+
+  <!-- ============ DRAFT ============ -->
+  <section class="section light">
+    <span class="kicker reveal"><app-chalk-bird class="kicker-bird" /> QUINDEL <em>redacta</em></span>
+    <h2 class="board-title">
+      <span chalk class="dim">Luego prepara el borrador.</span><br />
+      <span chalk [chalkDelay]="800" class="mark">
+        Nunca una hoja en blanco.
+        <svg class="scribble" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12 C80 4 160 16 296 8" pathLength="1" /></svg>
+      </span>
+    </h2>
+    <p class="lede reveal">Escritos rutinarios armados con los datos del expediente, en tu formato. Para que tu tiempo se vaya en el argumento, no en el encabezado.</p>
+
+    <div class="tabs reveal" role="tablist">
+      @for (d of drafts; track d.tab; let i = $index) {
+        <button type="button" role="tab" [class.on]="draftIndex() === i" [attr.aria-selected]="draftIndex() === i" (click)="draftIndex.set(i)">{{ d.tab }}</button>
+      }
+    </div>
+
+    <div class="draft-grid reveal">
+      @for (dr of [draft()]; track dr.tab) {
+      <div class="doc">
+        <span class="tag">Etapa 2 · en desarrollo</span>
+        <p class="doc-h">{{ dr.heading }}</p>
+        @for (line of dr.body; track $index) {
+          <p>{{ line }}</p>
+        }
+        <p class="caret">▍</p>
+        <small class="fine">Borrador de QUINDEL a partir del expediente. Cámbialo todo lo que quieras.</small>
+      </div>
+    }
+      <ol class="points">
+        <li><span>01</span><div><b>Parte del expediente.</b><p>Número de juicio, partes, juez y fechas salen del proceso, no de tu memoria.</p></div></li>
+        <li><span>02</span><div><b>Con tu estilo.</b><p>Aprende de los escritos que ya presentaste: tu encabezado, tus fórmulas, tu firma.</p></div></li>
+        <li><span>03</span><div><b>Tú revisas y firmas.</b><p>Es un borrador. La responsabilidad y la decisión final son tuyas.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ LAST STEP ============ -->
+  <section class="section">
+    <span class="kicker reveal"><app-chalk-bird class="kicker-bird" /> QUINDEL <em>te lo entrega</em></span>
+    <h2 class="board-title">
+      <span chalk class="dim">La última palabra</span><br />
+      <span chalk [chalkDelay]="500">siempre es tuya.</span>
+    </h2>
+    <p class="lede reveal">QUINDEL deja todo listo en tu panel. Tú lees, corriges y presentas cuando lo decidas.</p>
+
+    <div class="window reveal">
+      <div class="win-bar"><i></i><i></i><i></i><span>app.quindel.ec</span></div>
+      <div class="win-body">
+        <app-chalk-bird class="win-bird" />
+        <p class="win-title">Escrito revisado <span class="dim">por ti</span>.</p>
+        <p class="small muted">Contestación lista para presentar en el 17230-2025-04821.<br />Si el juez provee algo nuevo, te aviso antes que nadie.</p>
+      </div>
+      <div class="stamp" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <defs><path id="stamp-circle" d="M50 50 m-38 0 a38 38 0 1 1 76 0 a38 38 0 1 1 -76 0" /></defs>
+          <text><textPath href="#stamp-circle">TÚ DECIDES · TÚ FIRMAS · TÚ DECIDES · TÚ FIRMAS ·</textPath></text>
+        </svg>
+      </div>
+    </div>
+
+    <ul class="assurances reveal">
+      <li>◇ QUINDEL nunca presenta escritos por ti</li>
+      <li>◇ Cada alerta cita su actuación en el SATJE</li>
+      <li>◇ Datos tratados según la LOPDP</li>
+    </ul>
+  </section>
+
+  <!-- ============ MISSION (dot field) ============ -->
+  <section class="mission">
+    <app-dot-bird />
+    <div class="mission-copy">
+      <small class="label center">Menos revisar. Más litigar.</small>
+      <h2 class="board-title xl">
+        <span chalk class="dim">La misión no son más alertas.</span><br />
+        <span chalk [chalkDelay]="900">Es no perder ningún plazo.</span>
+      </h2>
+    </div>
+    <div class="compare">
+      <article class="card">
+        <small class="label">A mano</small>
+        <p><strong>Gratis, y lento.</strong> Abrir el SATJE causa por causa, cada mañana, y anotar plazos en una libreta. Un día ocupado basta para que se escape uno.</p>
+      </article>
+      <article class="card">
+        <small class="label">Alguien que revise por ti</small>
+        <p><strong>Funciona, y cuesta.</strong> Un procurador o asistente dedicado horas a vigilar procesos, en lugar de ayudarte a preparar el caso.</p>
+      </article>
+      <article class="card glow">
+        <small class="label"><app-chalk-bird class="kicker-bird" /> QUINDEL</small>
+        <p><strong>Revisa todos tus procesos cada hora,</strong> te avisa por WhatsApp lo que cambió, calcula el plazo y deja el expediente en orden, <strong>para que tú decidas qué hacer.</strong></p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ PLANS ============ -->
+  <section class="section light" id="planes">
+    <h2 class="board-title">
+      <span chalk>Un plan para cada</span>{{ ' ' }}
+      <span chalk [chalkDelay]="500" class="dim">forma de litigar.</span>
+    </h2>
+    <p class="lede reveal">Sin precios de lista: cada estudio es distinto. Agenda una demo de 20 minutos y te armamos una propuesta con tus procesos reales.</p>
+
+    <div class="plans">
+      @for (plan of plans; track plan.name) {
+        <article class="plan reveal" [class.featured]="plan.featured" [class.dark]="plan.featured">
+          @if (plan.featured) {
+            <app-peek-bird class="peek peek-plan" side="left" />
+            <span class="plan-flag">El más pedido</span>
+          }
+          <header class="plan-head">
+            <span class="plan-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48">
+                @switch (plan.icon) {
+                  @case ('solo') {
+                    <circle cx="24" cy="15" r="7" />
+                    <path d="M10 41c1-9 7-14 14-14s13 5 14 14" />
+                    <path d="M31 33l4 4 7-8" />
+                  }
+                  @case ('firm') {
+                    <circle cx="15" cy="17" r="5" /><circle cx="33" cy="17" r="5" /><circle cx="24" cy="12" r="5.5" />
+                    <path d="M5 38c1-7 5-11 10-11M43 38c-1-7-5-11-10-11M13 41c1-8 5-12 11-12s10 4 11 12" />
+                  }
+                  @default {
+                    <path d="M6 16 24 6l18 10H6z" />
+                    <path d="M10 20v16M18 20v16M30 20v16M38 20v16M5 41h38M7 37h34" />
+                  }
+                }
+              </svg>
+            </span>
+            <div>
+              <h3>{{ plan.name }}</h3>
+              <small>{{ plan.audience }}</small>
+            </div>
+          </header>
+          <p class="plan-lead">{{ plan.lead }}</p>
+
+          <div class="meters">
+            @for (m of plan.meters; track m.label) {
+              <div class="meter">
+                <div class="meter-top"><span>{{ m.label }}</span><b>{{ m.value }}</b></div>
+                <div class="meter-dots">
+                  @for (d of ten; track $index) {
+                    <i [class.on]="$index < m.level" [style.--k]="$index"></i>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <ul class="plan-list">
+            @for (f of plan.features; track f) {
+              <li>{{ f }}</li>
+            }
+          </ul>
+
+          <a class="btn plan-cta" [class.btn-light]="plan.featured" [class.btn-ink]="!plan.featured" href="#demo">
+            Agendar demo <span class="cta-arrow" aria-hidden="true">→</span>
+          </a>
+          <small class="plan-note">{{ plan.note }}</small>
+        </article>
+      }
+    </div>
+
+    <div class="includes reveal">
+      <span class="label">Todos los planes incluyen</span>
+      <ul>
+        <li>Revisión del SATJE cada hora</li>
+        <li>Alertas por WhatsApp</li>
+        <li>Panel web</li>
+        <li>Datos según la LOPDP</li>
+        <li>Soporte en español, desde Ecuador</li>
+      </ul>
+    </div>
+    <p class="fine center reveal">Programa piloto 2026: los primeros estudios en sumarse ayudan a definir el producto y conservan sus condiciones de lanzamiento.</p>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section narrow" id="preguntas">
+    <h2 class="board-title"><span chalk>Preguntas</span>{{ ' ' }}
+ <span chalk [chalkDelay]="300" class="dim">frecuentes.</span></h2>
+    <div class="faq">
+      @for (f of faqs; track f.q) {
+        <details class="reveal">
+          <summary>{{ f.q }}</summary>
+          <p>{{ f.a }}</p>
+        </details>
+      }
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS: 3D PHONE ============ -->
+  <section class="section light how">
+    <span class="kicker reveal"><app-chalk-bird class="kicker-bird" /> Así funciona</span>
+    <h2 class="apple-title reveal">Así trabaja tu copiloto.<br /><span>Sin que abras el SATJE.</span></h2>
+    <app-phone-demo />
+  </section>
+
+  <!-- ============ DEMO ============ -->
+  <section class="section demo" id="demo">
+    <h2 class="board-title xl">
+      <span chalk>Mira qué hay</span><br />
+      <span chalk [chalkDelay]="450" class="mark">
+        en tus procesos.
+        <svg class="scribble" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10 C90 18 200 2 297 12" pathLength="1" /></svg>
+      </span>
+    </h2>
+    <p class="lede reveal">Agenda una demo. En 20 minutos registramos tres de tus procesos y QUINDEL te muestra lo que encuentra.</p>
+
+    @if (!sent()) {
+      <form class="demo-form reveal" (submit)="submit($event)">
+        <app-peek-bird class="peek peek-form" side="left" />
+        <label><span>Nombre</span><input name="name" required autocomplete="name" placeholder="Ab. María Pérez" /></label>
+        <label><span>Estudio o empresa</span><input name="firm" autocomplete="organization" placeholder="Pérez & Asociados" /></label>
+        <label><span>Correo</span><input name="email" type="email" required autocomplete="email" placeholder="maria@estudio.ec" /></label>
+        <label><span>WhatsApp</span><input name="phone" type="tel" required autocomplete="tel" placeholder="+593 99 000 0000" /></label>
+        <label>
+          <span>¿Cuántos procesos llevas?</span>
+          <select name="volume" required>
+            <option value="" disabled selected>Elige uno</option>
+            <option>Menos de 30</option>
+            <option>30 a 100</option>
+            <option>100 a 400</option>
+            <option>Más de 400</option>
+          </select>
+        </label>
+        <label>
+          <span>¿Cuándo te queda mejor?</span>
+          <select name="slot" required>
+            <option value="" disabled selected>Elige un horario</option>
+            <option>Mañana (9:00 – 12:00)</option>
+            <option>Tarde (14:00 – 17:00)</option>
+            <option>Después de las 17:00</option>
+          </select>
+        </label>
+        <button class="btn btn-light wide" type="submit">Agendar mi demo</button>
+        <p class="fine">Te escribimos por WhatsApp para confirmar la hora. Sin tarjeta, sin compromiso.</p>
+      </form>
+    } @else {
+      <div class="sent">
+        <app-chalk-bird class="sent-bird" />
+        <p class="board-title"><span chalk>¡Listo! Ya vamos volando.</span></p>
+        <p class="lede">Te escribimos por WhatsApp en menos de un día hábil para confirmar tu demo.</p>
+      </div>
+    }
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="f-brand">
+    <a class="logo" href="#top"><app-chalk-bird class="logo-bird" /><span>QUINDEL</span></a>
+    <p class="small muted">El copiloto legal que vigila tus procesos y te avisa a tiempo.</p>
+  </div>
+  <div>
+    <b>Producto</b>
+    <a href="#como-funciona">Cómo funciona</a>
+    <a href="#copiloto">El copiloto</a>
+    <a href="#planes">Planes</a>
+    <a href="#demo">Agendar demo</a>
+  </div>
+  <div>
+    <b>Recursos</b>
+    <a href="#preguntas">Preguntas frecuentes</a>
+    <a href="#demo">Calculadora de plazos <em>Pronto</em></a>
+    <a href="#demo">Guía del SATJE <em>Pronto</em></a>
+  </div>
+  <div>
+    <b>Empresa</b>
+    <a href="mailto:hola@quindel.ec">hola&#64;quindel.ec</a>
+    <a href="#top">Privacidad</a>
+    <a href="#top">Términos</a>
+  </div>
+  <p class="f-legal">© 2026 QUINDEL. Todos los derechos reservados. QUINDEL no está afiliado al Consejo de la Judicatura ni a la Función Judicial del Ecuador.</p>
+</footer>

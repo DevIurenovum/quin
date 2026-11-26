@@ -6,6 +6,8 @@ export interface StageOptions {
   cameraPosition: THREE.Vector3Tuple;
   target: THREE.Vector3Tuple;
   shadowSize: number;
+  /** false: no orbit/zoom, and touch scrolling passes through the canvas (for embedding in a page). */
+  interactive?: boolean;
 }
 
 /**
@@ -23,6 +25,7 @@ export class Stage {
 
   private readonly timer = new THREE.Timer();
   private readonly observer: ResizeObserver;
+  private readonly visibility: IntersectionObserver;
   private readonly pmrem: THREE.PMREMGenerator;
   private readonly onPointerMove = (e: PointerEvent) => {
     const r = this.el.getBoundingClientRect();
@@ -54,6 +57,11 @@ export class Stage {
     this.controls.minDistance = 1.2;
     this.controls.maxDistance = 4;
     this.controls.maxPolarAngle = Math.PI * 0.55;
+    if (opts.interactive === false) {
+      this.controls.enabled = false;
+      this.controls.minDistance = 0.1; // close-ups are framed by the caller, not the user
+      renderer.domElement.style.touchAction = 'auto';
+    }
 
     // Soft blob shadow: cheaper than shadow-mapping and reads well for a single character.
     this.shadow = new THREE.Mesh(
@@ -69,12 +77,16 @@ export class Stage {
     this.observer.observe(el);
     this.resize();
 
-    renderer.setAnimationLoop((now) => {
+    const loop = (now: number) => {
       this.timer.update(now);
       onFrame(this.timer.getElapsed(), Math.min(this.timer.getDelta(), 0.05));
       this.controls.update();
       renderer.render(scene, camera);
-    });
+    };
+    renderer.setAnimationLoop(loop);
+    // Several viewers can live on one page: only the ones on screen render.
+    this.visibility = new IntersectionObserver(([e]) => renderer.setAnimationLoop(e.isIntersecting ? loop : null));
+    this.visibility.observe(el);
   }
 
   get elapsed(): number {
@@ -100,6 +112,7 @@ export class Stage {
   dispose(): void {
     this.renderer.setAnimationLoop(null);
     this.observer.disconnect();
+    this.visibility.disconnect();
     window.removeEventListener('pointermove', this.onPointerMove);
     this.controls.dispose();
     this.timer.dispose();

@@ -83,3 +83,16 @@ button:hover {
   opacity: 0.6;
   pointer-events: none;
 }
+
+:host(.embedded) {
+  background: transparent;
+  color: inherit;
+}
+
+:host(.embedded) .bar span {
+  background: currentColor;
+}
+
+:host(.embedded) .bar {
+  background: rgb(255 255 255 / 12%);
+}

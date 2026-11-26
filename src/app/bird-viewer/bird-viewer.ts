@@ -5,6 +5,7 @@ import {
   ElementRef,
   afterNextRender,
   inject,
+  input,
   signal,
   viewChild,
 } from '@angular/core';
@@ -28,10 +29,17 @@ const HEAD = new THREE.Vector3(-0.05, 0.64, 0);
   templateUrl: './bird-viewer.html',
   styleUrl: '../three/viewer.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '[class.embedded]': 'embedded()' },
 })
 export class BirdViewer {
   private readonly host = viewChild.required<ElementRef<HTMLDivElement>>('stage');
   private readonly destroyRef = inject(DestroyRef);
+  /** Page mode: transparent, no orbit controls or hints, rim-lit for a dark background, hovering. */
+  readonly embedded = input(false);
+  /** Embedded only: stay perched (peeking over an edge) instead of hovering. */
+  readonly perch = input(false);
+  readonly cameraPosition = input<THREE.Vector3Tuple>([-1.5, 0.75, 1.8]);
+  readonly target = input<THREE.Vector3Tuple>([0, 0.5, 0]);
 
   protected readonly progress = signal(0);
   protected readonly loaded = signal(false);
@@ -57,12 +65,24 @@ export class BirdViewer {
     afterNextRender(() => {
       const stage = new Stage(
         this.host().nativeElement,
-        { cameraPosition: [-1.5, 0.75, 1.8], target: [0, 0.5, 0], shadowSize: 0.9 },
+        {
+          cameraPosition: this.cameraPosition(),
+          target: this.target(),
+          shadowSize: 0.9,
+          interactive: !this.embedded(),
+        },
         (t, dt) => this.animate(t, dt),
       );
       this.stage = stage;
       stage.scene.add(this.root);
-      stage.onClick(() => this.toggleFlight());
+      if (this.embedded()) {
+        // White rim from behind so the black feathers separate from the dark page.
+        const rim = new THREE.DirectionalLight(0xffffff, 3);
+        rim.position.set(2, 1.5, -2.5);
+        stage.scene.add(rim);
+        stage.shadow.visible = false;
+      }
+      stage.onClick(() => !this.perch() && this.toggleFlight());
       this.destroyRef.onDestroy(() => stage.dispose());
 
       new GLTFLoader().load(
@@ -76,6 +96,7 @@ export class BirdViewer {
           }
           this.root.add(gltf.scene);
           this.loaded.set(true);
+          if (this.embedded() && !this.perch()) this.flying.set(true);
         },
         (e) => e.total && this.progress.set(Math.round((e.loaded / e.total) * 100)),
         () => this.error.set('No se pudo cargar el modelo 3D.'),
@@ -101,7 +122,7 @@ export class BirdViewer {
       Math.sin(t * 1.8) * 0.05 * flight,
     );
     root.rotation.set(Math.sin(t * 0.9) * 0.08 * flight, Math.sin(t * 0.6) * 0.15 * flight, -HOVER_PITCH * flight);
-    stage.controls.target.y = 0.5 + 0.18 * flight; // keep the bird framed while it hovers
+    stage.controls.target.y = this.target()[1] + 0.18 * flight; // keep the bird framed while it hovers
     const breath = Math.sin(t * 3) * 0.012 * (1 - flight);
     root.scale.set(1 - breath * 0.5, 1 + breath, 1 - breath * 0.5);
     root.updateMatrixWorld();
